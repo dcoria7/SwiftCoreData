@@ -52,29 +52,7 @@ class ViewController: UITableViewController {
         let saveAction = UIAlertAction(title: "Save", style: .default) { [weak self] action in
             guard let textfield = alertController.textFields?.first, let itemToAdd = textfield.text else { return }
             
-            if (self?.isValidUsername(username: itemToAdd))!{
-                guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
-                let managedObjectContext = appDelegate.persistentContainer.viewContext
-                
-                //let entity = NSEntityDescription.entity(forEntityName: "User", in: managedObjectContext!)
-                let user = User(context: managedObjectContext)
-                //let newUser = NSManagedObject(entity: entity!, insertInto: managedObjectContext)
-                
-                user.username = itemToAdd
-                user.password = self?.password
-                user.age = self?.age
-                //newUser.setValue("lolo", forKey: "username")
-                //newUser.setValue("12345", forKey: "password")
-                //newUser.setValue("20", forKey: "age")
-                
-                
-                let userModel = UserData.init(username: itemToAdd, age: self?.age, password: self?.password)
-                appDelegate.persistentContainer.performBackgroundTask { (context) in
-                    appDelegate.saveContext()
-                }
-                self?.usersData.append(userModel)
-                self?.refreshCurrentData()
-            }
+            self?.saveUser(input: itemToAdd)
             
         }
         let cancelAction = UIAlertAction(title: "Cancel", style: .destructive, handler: nil)
@@ -88,6 +66,32 @@ class ViewController: UITableViewController {
     func refreshCurrentData(){
         
         self.tableView.reloadData()
+    }
+    
+    func saveUser(input:String){
+        if (self.isValidUsername(username: input)){
+            guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+            let managedObjectContext = appDelegate.persistentContainer.viewContext
+            
+            //let entity = NSEntityDescription.entity(forEntityName: "User", in: managedObjectContext!)
+            let user = User(context: managedObjectContext)
+            //let newUser = NSManagedObject(entity: entity!, insertInto: managedObjectContext)
+            
+            user.username = input
+            user.password = self.password
+            user.age = self.age
+            //newUser.setValue("lolo", forKey: "username")
+            //newUser.setValue("12345", forKey: "password")
+            //newUser.setValue("20", forKey: "age")
+            
+            
+            let userModel = UserData.init(username: input, age: self.age, password: self.password)
+            appDelegate.persistentContainer.performBackgroundTask { (context) in
+                appDelegate.saveContext()
+            }
+            self.usersData.append(userModel)
+            self.refreshCurrentData()
+        }
     }
     
     func getUser(){
